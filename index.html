@@ -23,21 +23,23 @@
       .main-grid {
         flex-direction: row;
         justify-content: space-between;
-        align-items: flex-start;
+        align-items: stretch;
+      }
+      .column {
+        width: 33.33%;
       }
     }
 
     .column {
-      flex: 1;
-      padding: 10px;
       text-align: center;
+      padding: 10px;
     }
 
     .clock-container {
       position: relative;
       width: 100%;
       max-width: 400px;
-      aspect-ratio: 1/1;
+      aspect-ratio: 1 / 1;
       margin: auto;
       border: 12px solid white;
       border-radius: 50%;
@@ -51,51 +53,39 @@
       transform-origin: 0% 50%;
     }
 
-    .hand.hour {
-      height: 6px;
-      background: white;
-      z-index: 3;
-    }
-
-    .hand.minute {
-      height: 4px;
-      background: lightblue;
-      z-index: 2;
-    }
-
-    .hand.second {
-      height: 2px;
-      background: red;
-      z-index: 1;
-    }
+    .hand.hour { height: 6px; background: white; z-index: 3; }
+    .hand.minute { height: 4px; background: lightblue; z-index: 2; }
+    .hand.second { height: 2px; background: red; z-index: 1; }
 
     .number {
       position: absolute;
       color: white;
-      font-size: 1.2em;
+      font-size: 1.3em;
       transform: translate(-50%, -50%);
     }
 
     .exam-details {
-      font-size: 1.8em;
-      line-height: 1.6em;
+      font-size: 2em;
+      line-height: 1.5em;
       text-align: left;
+      margin: auto;
+      max-width: 500px;
     }
 
     .exam-details strong {
-      font-size: 2em;
+      font-size: 1.8em;
       display: block;
       margin-bottom: 0.3em;
     }
 
     .digital {
-      font-size: 5em;
+      font-size: 6em;
       color: lime;
-      margin-top: 1em;
+      margin-top: 0.5em;
     }
 
     #date-display {
-      font-size: 1.5em;
+      font-size: 2em;
     }
 
     .controls {
@@ -129,13 +119,8 @@
       display: none;
     }
 
-    #thirtyMinDisplay {
-      color: orange;
-    }
-
-    #fiveMinDisplay {
-      color: red;
-    }
+    #thirtyMinDisplay { color: orange; }
+    #fiveMinDisplay { color: red; }
   </style>
 </head>
 <body>
@@ -160,6 +145,7 @@
     <!-- Column 2: Exam Info + Controls -->
     <div class="column exam-details">
       <div id="module-label"><strong>Module: Spanish / French</strong></div>
+      <div id="startTimeDisplay"></div>
       <div id="endTimeDisplay"></div>
       <div id="extraTimeDisplay"></div>
       <div id="thirtyMinDisplay"></div>
@@ -232,6 +218,7 @@
       const end = new Date(start.getTime() + duration * 60000);
       const extra = new Date(end.getTime() + (duration * extraPercent / 100) * 60000);
 
+      document.getElementById('startTimeDisplay').textContent = `Start: ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
       document.getElementById('endTimeDisplay').textContent = `End: ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
       document.getElementById('extraTimeDisplay').textContent = `Extra Time: ${extra.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
