@@ -9,16 +9,19 @@
       font-family: Arial, sans-serif;
       background-color: #111;
       color: white;
-      display: flex;
-      gap: 20px;
       padding: 20px;
+      text-align: center;
     }
 
-    .left, .right {
-      flex: 1;
+    .layout {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
     }
 
-    .clock {
+    .clock-container {
       position: relative;
       width: 300px;
       height: 300px;
@@ -30,23 +33,29 @@
     .hand {
       position: absolute;
       width: 50%;
-      background: red;
       top: 50%;
-      transform-origin: 100%;
-      transform: rotate(90deg);
+      left: 50%;
+      transform-origin: 0% 50%;
     }
 
-    .hand.hour { height: 6px; background: white; }
-    .hand.minute { height: 4px; background: white; }
-    .hand.second { height: 2px; background: red; }
+    .hand.hour { height: 6px; background: white; z-index: 3; }
+    .hand.minute { height: 4px; background: white; z-index: 2; }
+    .hand.second { height: 2px; background: red; z-index: 1; }
 
-    .info {
-      margin-top: 20px;
-      font-size: 1.2em;
+    .number {
+      position: absolute;
+      color: white;
+      font-size: 1em;
+      transform: translate(-50%, -50%);
     }
 
-    .info input {
-      width: 150px;
+    .controls {
+      text-align: left;
+      max-width: 300px;
+    }
+
+    .controls input {
+      width: 100%;
       font-size: 1em;
       margin: 5px 0;
     }
@@ -54,27 +63,52 @@
     .digital {
       font-size: 3em;
       color: lime;
-      text-align: center;
+      margin-top: 20px;
     }
 
-    label {
-      display: block;
-      margin-top: 10px;
+    button.toggle-btn {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #444;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .module-label {
+      font-size: 1.5em;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="left">
-    <div class="clock">
+  <div class="module-label" id="module-label">Module: Spanish / French</div>
+  <button class="toggle-btn" onclick="toggleControls()">Toggle Controls</button>
+
+  <div class="layout">
+    <div class="clock-container">
       <div class="hand hour" id="hour-hand"></div>
       <div class="hand minute" id="minute-hand"></div>
       <div class="hand second" id="second-hand"></div>
+      <!-- Numbers 1–12 -->
+      <script>
+        for (let i = 1; i <= 12; i++) {
+          const angle = (i * 30) * Math.PI / 180;
+          const x = 150 + 130 * Math.sin(angle);
+          const y = 150 - 130 * Math.cos(angle);
+          document.write(`<div class="number" style="left:${x}px; top:${y}px;">${i}</div>`);
+        }
+      </script>
     </div>
-  </div>
-  <div class="right">
-    <div class="info">
+
+    <div class="controls" id="controls">
       <label>Module:
-        <input type="text" id="module" value="Spanish / French">
+        <input type="text" id="module" value="Spanish / French" oninput="updateModuleLabel()">
       </label>
       <label>Start Time (HH:MM):
         <input type="time" id="startTime" value="13:55">
@@ -85,7 +119,6 @@
       <label>Extra Time %:
         <input type="number" id="extraPercent" value="25">
       </label>
-      <br>
       <label><input type="checkbox" id="show30min" checked> Show 30 mins remaining</label>
       <label><input type="checkbox" id="show5min" checked> Show 5 mins remaining</label>
 
@@ -94,9 +127,10 @@
       <p id="thirtyMinDisplay" style="color: orange;"></p>
       <p id="fiveMinDisplay" style="color: red;"></p>
     </div>
-    <div class="digital" id="digital-clock">--:--</div>
-    <div style="text-align: center; font-size: 1.2em;" id="date-display"></div>
   </div>
+
+  <div class="digital" id="digital-clock">--:--</div>
+  <div style="font-size: 1.2em;" id="date-display"></div>
 
   <script>
     function updateAnalogClock() {
@@ -148,17 +182,25 @@
         ? `5 min left: ${t5.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
     }
 
+    function toggleControls() {
+      const controls = document.getElementById('controls');
+      controls.classList.toggle('hidden');
+    }
+
+    function updateModuleLabel() {
+      const moduleText = document.getElementById('module').value;
+      document.getElementById('module-label').textContent = `Module: ${moduleText}`;
+    }
+
     setInterval(() => {
       updateAnalogClock();
       updateDigitalClock();
     }, 1000);
 
-    // Bind events
     ['startTime', 'duration', 'extraPercent', 'show30min', 'show5min'].forEach(id =>
       document.getElementById(id).addEventListener('input', calculateTimes)
     );
 
-    // Init
     calculateTimes();
     updateAnalogClock();
     updateDigitalClock();
