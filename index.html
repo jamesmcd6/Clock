@@ -3,31 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Exam Timer</title>
+  <title>Exam Clock</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #111;
       color: white;
+      margin: 0;
       padding: 20px;
-      text-align: center;
     }
 
-    .layout {
+    .main-grid {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 40px;
-      margin-top: 20px;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    @media (min-width: 1000px) {
+      .main-grid {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+    }
+
+    .column {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
     }
 
     .clock-container {
       position: relative;
-      width: 300px;
-      height: 300px;
-      border: 10px solid white;
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 1/1;
+      margin: auto;
+      border: 12px solid white;
       border-radius: 50%;
-      margin: 0 auto;
     }
 
     .hand {
@@ -59,49 +72,61 @@
     .number {
       position: absolute;
       color: white;
-      font-size: 1em;
+      font-size: 1.2em;
       transform: translate(-50%, -50%);
     }
 
-    .controls {
+    .exam-details {
+      font-size: 1.8em;
+      line-height: 1.6em;
       text-align: left;
-      max-width: 300px;
-      margin: 0 auto;
     }
 
-    .controls input {
-      width: 100%;
-      font-size: 1em;
-      margin: 5px 0;
+    .exam-details strong {
+      font-size: 2em;
+      display: block;
+      margin-bottom: 0.3em;
     }
 
     .digital {
-      font-size: 3em;
+      font-size: 5em;
       color: lime;
+      margin-top: 1em;
+    }
+
+    #date-display {
+      font-size: 1.5em;
+    }
+
+    .controls {
+      font-size: 1em;
       margin-top: 20px;
     }
 
-    button.toggle-btn {
-      margin-bottom: 10px;
-      padding: 10px;
-      background-color: #444;
-      color: white;
-      border: none;
-      cursor: pointer;
+    .controls label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    .controls input[type="text"],
+    .controls input[type="time"],
+    .controls input[type="number"] {
+      width: 100%;
       font-size: 1em;
+    }
+
+    .toggle-btn {
+      padding: 10px;
+      font-size: 1em;
+      background-color: #444;
+      border: none;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
     }
 
     .hidden {
       display: none;
-    }
-
-    .module-label {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-    }
-
-    .time-info p {
-      margin: 5px 0;
     }
 
     #thirtyMinDisplay {
@@ -114,52 +139,57 @@
   </style>
 </head>
 <body>
-  <div class="module-label" id="module-label">Module: Spanish / French</div>
-  <button class="toggle-btn" onclick="toggleControls()">Toggle Controls</button>
-
-  <div class="layout">
-    <div class="clock-container">
-      <div class="hand hour" id="hour-hand"></div>
-      <div class="hand minute" id="minute-hand"></div>
-      <div class="hand second" id="second-hand"></div>
-      <!-- Numbers 1–12 -->
-      <script>
-        for (let i = 1; i <= 12; i++) {
-          const angle = (i * 30) * Math.PI / 180;
-          const x = 150 + 130 * Math.sin(angle);
-          const y = 150 - 130 * Math.cos(angle);
-          document.write(`<div class="number" style="left:${x}px; top:${y}px;">${i}</div>`);
-        }
-      </script>
+  <div class="main-grid">
+    <!-- Column 1: Analog Clock -->
+    <div class="column">
+      <div class="clock-container">
+        <div class="hand hour" id="hour-hand"></div>
+        <div class="hand minute" id="minute-hand"></div>
+        <div class="hand second" id="second-hand"></div>
+        <script>
+          for (let i = 1; i <= 12; i++) {
+            const angle = (i * 30) * Math.PI / 180;
+            const x = 200 + 170 * Math.sin(angle);
+            const y = 200 - 170 * Math.cos(angle);
+            document.write(`<div class="number" style="left:${x}px; top:${y}px;">${i}</div>`);
+          }
+        </script>
+      </div>
     </div>
 
-    <div class="controls" id="controls">
-      <label>Module:
-        <input type="text" id="module" value="Spanish / French" oninput="updateModuleLabel()">
-      </label>
-      <label>Start Time (HH:MM):
-        <input type="time" id="startTime" value="13:55">
-      </label>
-      <label>Duration (mins):
-        <input type="number" id="duration" value="90">
-      </label>
-      <label>Extra Time %:
-        <input type="number" id="extraPercent" value="25">
-      </label>
-      <label><input type="checkbox" id="show30min" checked> Show 30 mins remaining</label>
-      <label><input type="checkbox" id="show5min" checked> Show 5 mins remaining</label>
+    <!-- Column 2: Exam Info + Controls -->
+    <div class="column exam-details">
+      <div id="module-label"><strong>Module: Spanish / French</strong></div>
+      <div id="endTimeDisplay"></div>
+      <div id="extraTimeDisplay"></div>
+      <div id="thirtyMinDisplay"></div>
+      <div id="fiveMinDisplay"></div>
+
+      <button class="toggle-btn" onclick="toggleControls()">Toggle Controls</button>
+      <div class="controls" id="controls">
+        <label>Module:
+          <input type="text" id="module" value="Spanish / French" oninput="updateModuleLabel()">
+        </label>
+        <label>Start Time (HH:MM):
+          <input type="time" id="startTime" value="13:55">
+        </label>
+        <label>Duration (mins):
+          <input type="number" id="duration" value="90">
+        </label>
+        <label>Extra Time %:
+          <input type="number" id="extraPercent" value="25">
+        </label>
+        <label><input type="checkbox" id="show30min" checked> Show 30 mins remaining</label>
+        <label><input type="checkbox" id="show5min" checked> Show 5 mins remaining</label>
+      </div>
+    </div>
+
+    <!-- Column 3: Digital Clock -->
+    <div class="column">
+      <div class="digital" id="digital-clock">--:--</div>
+      <div id="date-display"></div>
     </div>
   </div>
-
-  <div class="time-info">
-    <p id="endTimeDisplay"></p>
-    <p id="extraTimeDisplay"></p>
-    <p id="thirtyMinDisplay"></p>
-    <p id="fiveMinDisplay"></p>
-  </div>
-
-  <div class="digital" id="digital-clock">--:--</div>
-  <div style="font-size: 1.2em;" id="date-display"></div>
 
   <script>
     function updateAnalogClock() {
@@ -221,7 +251,7 @@
 
     function updateModuleLabel() {
       const moduleText = document.getElementById('module').value;
-      document.getElementById('module-label').textContent = `Module: ${moduleText}`;
+      document.getElementById('module-label').innerHTML = `<strong>Module: ${moduleText}</strong>`;
     }
 
     setInterval(() => {
