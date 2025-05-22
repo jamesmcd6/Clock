@@ -168,9 +168,9 @@
       const minute = now.getMinutes();
       const second = now.getSeconds();
 
-      const hourDeg = (hour + minute / 60) * 30;
-      const minuteDeg = (minute + second / 60) * 6;
-      const secondDeg = second * 6;
+      const hourDeg = ((hour + minute / 60) * 30) - 90;
+      const minuteDeg = ((minute + second / 60) * 6) - 90;
+      const secondDeg = (second * 6) - 90;
 
       document.getElementById('hour-hand').style.transform = `rotate(${hourDeg}deg)`;
       document.getElementById('minute-hand').style.transform = `rotate(${minuteDeg}deg)`;
