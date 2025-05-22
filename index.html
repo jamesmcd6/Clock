@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Exam Timer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .left, .right {
+      flex: 1;
+    }
+
+    .clock {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      border: 10px solid white;
+      border-radius: 50%;
+      margin: 0 auto;
+    }
+
+    .hand {
+      position: absolute;
+      width: 50%;
+      background: red;
+      top: 50%;
+      transform-origin: 100%;
+      transform: rotate(90deg);
+    }
+
+    .hand.hour { height: 6px; background: white; }
+    .hand.minute { height: 4px; background: white; }
+    .hand.second { height: 2px; background: red; }
+
+    .info {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+
+    .info input {
+      width: 150px;
+      font-size: 1em;
+      margin: 5px 0;
+    }
+
+    .digital {
+      font-size: 3em;
+      color: lime;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="left">
+    <div class="clock">
+      <div class="hand hour" id="hour-hand"></div>
+      <div class="hand minute" id="minute-hand"></div>
+      <div class="hand second" id="second-hand"></div>
+    </div>
+  </div>
+  <div class="right">
+    <div class="info">
+      <label>Module:
+        <input type="text" id="module" value="Spanish / French">
+      </label>
+      <label>Start Time (HH:MM):
+        <input type="time" id="startTime" value="13:55">
+      </label>
+      <label>Duration (mins):
+        <input type="number" id="duration" value="90">
+      </label>
+      <label>Extra Time %:
+        <input type="number" id="extraPercent" value="25">
+      </label>
+      <br>
+      <label><input type="checkbox" id="show30min" checked> Show 30 mins remaining</label>
+      <label><input type="checkbox" id="show5min" checked> Show 5 mins remaining</label>
+
+      <p id="endTimeDisplay"></p>
+      <p id="extraTimeDisplay"></p>
+      <p id="thirtyMinDisplay" style="color: orange;"></p>
+      <p id="fiveMinDisplay" style="color: red;"></p>
+    </div>
+    <div class="digital" id="digital-clock">--:--</div>
+    <div style="text-align: center; font-size: 1.2em;" id="date-display"></div>
+  </div>
+
+  <script>
+    function updateAnalogClock() {
+      const now = new Date();
+      const hour = now.getHours() % 12;
+      const minute = now.getMinutes();
+      const second = now.getSeconds();
+
+      document.getElementById('hour-hand').style.transform = `rotate(${(hour + minute / 60) * 30}deg)`;
+      document.getElementById('minute-hand').style.transform = `rotate(${(minute + second / 60) * 6}deg)`;
+      document.getElementById('second-hand').style.transform = `rotate(${second * 6}deg)`;
+    }
+
+    function updateDigitalClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const dateStr = now.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric' });
+      document.getElementById('digital-clock').textContent = timeStr;
+      document.getElementById('date-display').textContent = dateStr;
+    }
+
+    function calculateTimes() {
+      const startTime = document.getElementById('startTime').value;
+      const duration = parseInt(document.getElementById('duration').value);
+      const extraPercent = parseFloat(document.getElementById('extraPercent').value);
+
+      const show30min = document.getElementById('show30min').checked;
+      const show5min = document.getElementById('show5min').checked;
+
+      if (!startTime || isNaN(duration) || isNaN(extraPercent)) return;
+
+      const [hour, minute] = startTime.split(':').map(Number);
+      const start = new Date();
+      start.setHours(hour, minute, 0, 0);
+
+      const end = new Date(start.getTime() + duration * 60000);
+      const extra = new Date(end.getTime() + (duration * extraPercent / 100) * 60000);
+
+      document.getElementById('endTimeDisplay').textContent = `End: ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      document.getElementById('extraTimeDisplay').textContent = `Extra Time: ${extra.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+      const t30 = new Date(end.getTime() - 30 * 60000);
+      const t5 = new Date(end.getTime() - 5 * 60000);
+
+      document.getElementById('thirtyMinDisplay').textContent = show30min
+        ? `30 min left: ${t30.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
+
+      document.getElementById('fiveMinDisplay').textContent = show5min
+        ? `5 min left: ${t5.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
+    }
+
+    setInterval(() => {
+      updateAnalogClock();
+      updateDigitalClock();
+    }, 1000);
+
+    // Bind events
+    ['startTime', 'duration', 'extraPercent', 'show30min', 'show5min'].forEach(id =>
+      document.getElementById(id).addEventListener('input', calculateTimes)
+    );
+
+    // Init
+    calculateTimes();
+    updateAnalogClock();
+    updateDigitalClock();
+  </script>
+</body>
+</html>
