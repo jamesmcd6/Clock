@@ -38,9 +38,23 @@
       transform-origin: 0% 50%;
     }
 
-    .hand.hour { height: 6px; background: white; z-index: 3; }
-    .hand.minute { height: 4px; background: white; z-index: 2; }
-    .hand.second { height: 2px; background: red; z-index: 1; }
+    .hand.hour {
+      height: 6px;
+      background: white;
+      z-index: 3;
+    }
+
+    .hand.minute {
+      height: 4px;
+      background: lightblue;
+      z-index: 2;
+    }
+
+    .hand.second {
+      height: 2px;
+      background: red;
+      z-index: 1;
+    }
 
     .number {
       position: absolute;
@@ -52,6 +66,7 @@
     .controls {
       text-align: left;
       max-width: 300px;
+      margin: 0 auto;
     }
 
     .controls input {
@@ -83,6 +98,18 @@
     .module-label {
       font-size: 1.5em;
       margin-bottom: 10px;
+    }
+
+    .time-info p {
+      margin: 5px 0;
+    }
+
+    #thirtyMinDisplay {
+      color: orange;
+    }
+
+    #fiveMinDisplay {
+      color: red;
     }
   </style>
 </head>
@@ -121,12 +148,14 @@
       </label>
       <label><input type="checkbox" id="show30min" checked> Show 30 mins remaining</label>
       <label><input type="checkbox" id="show5min" checked> Show 5 mins remaining</label>
-
-      <p id="endTimeDisplay"></p>
-      <p id="extraTimeDisplay"></p>
-      <p id="thirtyMinDisplay" style="color: orange;"></p>
-      <p id="fiveMinDisplay" style="color: red;"></p>
     </div>
+  </div>
+
+  <div class="time-info">
+    <p id="endTimeDisplay"></p>
+    <p id="extraTimeDisplay"></p>
+    <p id="thirtyMinDisplay"></p>
+    <p id="fiveMinDisplay"></p>
   </div>
 
   <div class="digital" id="digital-clock">--:--</div>
@@ -139,9 +168,13 @@
       const minute = now.getMinutes();
       const second = now.getSeconds();
 
-      document.getElementById('hour-hand').style.transform = `rotate(${(hour + minute / 60) * 30}deg)`;
-      document.getElementById('minute-hand').style.transform = `rotate(${(minute + second / 60) * 6}deg)`;
-      document.getElementById('second-hand').style.transform = `rotate(${second * 6}deg)`;
+      const hourDeg = (hour + minute / 60) * 30;
+      const minuteDeg = (minute + second / 60) * 6;
+      const secondDeg = second * 6;
+
+      document.getElementById('hour-hand').style.transform = `rotate(${hourDeg}deg)`;
+      document.getElementById('minute-hand').style.transform = `rotate(${minuteDeg}deg)`;
+      document.getElementById('second-hand').style.transform = `rotate(${secondDeg}deg)`;
     }
 
     function updateDigitalClock() {
@@ -183,8 +216,7 @@
     }
 
     function toggleControls() {
-      const controls = document.getElementById('controls');
-      controls.classList.toggle('hidden');
+      document.getElementById('controls').classList.toggle('hidden');
     }
 
     function updateModuleLabel() {
