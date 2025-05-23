@@ -17,6 +17,7 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
+      padding-top: 10rem;
     }
 
     @media (min-width: 1000px) {
@@ -25,8 +26,11 @@
         justify-content: space-between;
         align-items: stretch;
       }
-      .column {
-        width: 33.33%;
+      .columnA {
+        width: 40%;
+      }
+      .columnB {
+        width: 30%;
       }
     }
 
@@ -53,19 +57,19 @@
       transform-origin: 0% 50%;
     }
 
-    .hand.hour { height: 6px; background: white; z-index: 3; }
-    .hand.minute { height: 4px; background: lightblue; z-index: 2; }
+    .hand.hour { height: 8px; background: white; z-index: 3; width:35%; }
+    .hand.minute { height: 6px; background: cyan; z-index: 2; }
     .hand.second { height: 2px; background: red; z-index: 1; }
 
     .number {
       position: absolute;
       color: white;
-      font-size: 1.3em;
+      font-size: 2.5em;
       transform: translate(-50%, -50%);
     }
 
     .exam-details {
-      font-size: 2em;
+      font-size: 2.5em;
       line-height: 1.5em;
       text-align: left;
       margin: auto;
@@ -78,6 +82,30 @@
       margin-bottom: 0.3em;
     }
 
+    .time-table {
+      font-size: 1.2em;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2em;
+    }
+
+    .time-table-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .time-label {
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .time-value {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .yellow { color: yellow; }
+
     .digital {
       font-size: 6em;
       color: lime;
@@ -89,7 +117,7 @@
     }
 
     .controls {
-      font-size: 1em;
+      font-size: 0.7em; !important
       margin-top: 20px;
     }
 
@@ -107,26 +135,25 @@
 
     .toggle-btn {
       padding: 10px;
-      font-size: 1em;
+      margin-top:4rem;
+      font-size: 0.7em;
       background-color: #444;
       border: none;
       color: white;
       cursor: pointer;
-      margin-top: 10px;
     }
+
+
 
     .hidden {
       display: none;
     }
-
-    #thirtyMinDisplay { color: orange; }
-    #fiveMinDisplay { color: red; }
   </style>
 </head>
 <body>
   <div class="main-grid">
     <!-- Column 1: Analog Clock -->
-    <div class="column">
+    <div class="column columnB">
       <div class="clock-container">
         <div class="hand hour" id="hour-hand"></div>
         <div class="hand minute" id="minute-hand"></div>
@@ -143,21 +170,23 @@
     </div>
 
     <!-- Column 2: Exam Info + Controls -->
-    <div class="column exam-details">
-      <div id="module-label"><strong>Module: Spanish / French</strong></div>
-      <div id="startTimeDisplay"></div>
-      <div id="endTimeDisplay"></div>
-      <div id="extraTimeDisplay"></div>
-      <div id="thirtyMinDisplay"></div>
-      <div id="fiveMinDisplay"></div>
+    <div class="column exam-details columnA">
+      <div id="module-label"><strong>Exam</strong></div>
+      <div class="time-table">
+        <div class="time-table-row"><span class="time-label">Start:</span><span class="time-value" id="startTimeDisplay"></span></div>
+        <div class="time-table-row"><span class="time-label yellow">30 min left:</span><span class="time-value yellow" id="thirtyMinDisplay"></span></div>
+        <div class="time-table-row"><span class="time-label yellow">5 min left:</span><span class="time-value yellow" id="fiveMinDisplay"></span></div>
+        <div class="time-table-row"><span class="time-label">End:</span><span class="time-value" id="endTimeDisplay"></span></div>
+        <div class="time-table-row"><span class="time-label">Extra Time:</span><span class="time-value" id="extraTimeDisplay"></span></div>
+      </div>
 
       <button class="toggle-btn" onclick="toggleControls()">Toggle Controls</button>
       <div class="controls" id="controls">
-        <label>Module:
-          <input type="text" id="module" value="Spanish / French" oninput="updateModuleLabel()">
+        <label>Exam:
+          <input type="text" id="module" value="Exam" oninput="updateModuleLabel()">
         </label>
         <label>Start Time (HH:MM):
-          <input type="time" id="startTime" value="13:55">
+          <input type="time" id="startTime" value="13:00">
         </label>
         <label>Duration (mins):
           <input type="number" id="duration" value="90">
@@ -171,7 +200,7 @@
     </div>
 
     <!-- Column 3: Digital Clock -->
-    <div class="column">
+    <div class="column columnB">
       <div class="digital" id="digital-clock">--:--</div>
       <div id="date-display"></div>
     </div>
@@ -218,18 +247,18 @@
       const end = new Date(start.getTime() + duration * 60000);
       const extra = new Date(end.getTime() + (duration * extraPercent / 100) * 60000);
 
-      document.getElementById('startTimeDisplay').textContent = `Start: ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-      document.getElementById('endTimeDisplay').textContent = `End: ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-      document.getElementById('extraTimeDisplay').textContent = `Extra Time: ${extra.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      document.getElementById('startTimeDisplay').textContent = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('endTimeDisplay').textContent = end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('extraTimeDisplay').textContent = extra.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       const t30 = new Date(end.getTime() - 30 * 60000);
       const t5 = new Date(end.getTime() - 5 * 60000);
 
       document.getElementById('thirtyMinDisplay').textContent = show30min
-        ? `30 min left: ${t30.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
+        ? t30.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
 
       document.getElementById('fiveMinDisplay').textContent = show5min
-        ? `5 min left: ${t5.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
+        ? t5.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
     }
 
     function toggleControls() {
@@ -238,7 +267,7 @@
 
     function updateModuleLabel() {
       const moduleText = document.getElementById('module').value;
-      document.getElementById('module-label').innerHTML = `<strong>Module: ${moduleText}</strong>`;
+      document.getElementById('module-label').innerHTML = `<strong>${moduleText}</strong>`;
     }
 
     setInterval(() => {
